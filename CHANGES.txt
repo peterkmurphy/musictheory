@@ -1,0 +1,4 @@
+v0.1, 01/05/2011 -- Initial release. Took code and made setup script.
+v0.2, 11/05/2011 -- Remove bugs for working with chordgenerator.
+v0.3, 06/06/2011 -- Add license information. Add more scales.
+v0.4, 24/04/2013 -- Try to make a half-decent PyPI package.
