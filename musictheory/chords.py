@@ -1,8 +1,8 @@
 #!/usr/bin/python 
 #-*- coding: UTF-8 -*-
-# scales.py: Defines (and contains) the classes for chords.
+# chords.py: Defines (and contains) the classes for chords.
 #
-# Copyright (c) 2008-2013 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2014 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -80,10 +80,13 @@ def generate_west_chords():
     chordseq = [];
     bases = [[0, 3], [0, 4]];
     triads = enl_seq(bases, [6, 7, 8]);
-    suspendeds = [[0, 5, 6], [0, 5, 7], [0, 5, 8]];
+    
+# PKM2014 - add two pseudo suspended chords         
+    
+    suspendeds = [[0, 5, 6], [0, 5, 7], [0, 5, 8], [0, 6, 7], [0, 6, 8]];
     sixths = enl_seq(triads, [8, 9]);
     sevenths = enl_seq(triads, [10, 11]);
-    suspended_sevenths = enl_seq(suspendeds, [10, 11]);
+    suspended_sevenths = enl_seq(suspendeds, [9, 10, 11]);
     ninths = enl_seq(sevenths, [13, 14, 15]);
     elevenths = enl_seq(ninths, [17, 18]);
     thirteenths = enl_seq(elevenths, [20, 21]);
@@ -170,7 +173,8 @@ def generate_west_chords():
                             our_tabbr+add6_abbrv[k]+add9_abbrv[l]));
 
 
-# Then we add the suspended chords.
+# Then we add the suspended chords. They are treated differently from other chords,
+# as one can't put 9th, 11th or 13th on there.
 
     chordseq.append(noteseq_chord("Suspend Flat 5th", WestTemp, [0, 5, 6], 
         CHORDTYPE_DICT["Suspended"], "sus-5"));
@@ -178,15 +182,30 @@ def generate_west_chords():
         CHORDTYPE_DICT["Suspended"], "sus"));
     chordseq.append(noteseq_chord("Suspend Sharp 5th", WestTemp, [0, 5, 8], 
         CHORDTYPE_DICT["Suspended"], "sus+5"));
+        
+# PKM2014 - add two pseudo suspended chords         
+        
+    chordseq.append(noteseq_chord("Suspend Sharp 4th", WestTemp, [0, 6, 7], 
+        CHORDTYPE_DICT["Suspended"], "sus+4"));
+    chordseq.append(noteseq_chord("Suspend Sharp 4th Sharp 5th", WestTemp, [0, 6, 8], 
+        CHORDTYPE_DICT["Suspended"], "sus+4+5"));        
 
 # Afterwards, we add the 7th (including sus 7th), 9th, 11th and 13th chords.     
     
     for i in sevenths_and_above:
+        suspendsharpfourth = False
         abbrev = "";
         name = "";
         if 5 in i:
             abbrev += "sus / ";
-            name += "Suspend "            
+            name += "Suspend "
+
+# PKM2014 - add code for two pseudo suspended 7th chords         
+
+        if len(i) == 4 and 6 in i and ((7 in i) or (8 in i)):
+            abbrev += "sus+4 / ";
+            name += "Suspend Sharp 4th "
+            suspendsharpfourth = True
         if 3 in i:
             if 11 in i:
                 abbrev += "maj / min";
@@ -198,6 +217,12 @@ def generate_west_chords():
             if 11 in i:
                 abbrev += "maj";
                 name += "Major "
+                
+            #PKM2014 - this is for suspended diminished chords.    
+                
+            elif 9 in i and len(i) == 4 and ((5 in i) or (6 in i and ((7 in i) or (8 in i)))):
+                abbrev += "dim";
+                name += "Diminish "                
         if 21 in i:
             abbrev += "13";
             name += "13th "
@@ -225,7 +250,7 @@ def generate_west_chords():
         if 8 in i:
             abbrev += "+5";
             name += "Sharp 5th "
-        if 6 in i:
+        if 6 in i and not suspendsharpfourth:
             abbrev += "-5";
             name += "Flat 5th ";
             

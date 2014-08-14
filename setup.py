@@ -4,7 +4,7 @@ from distutils.core import setup
 
 setup(
     name='musictheory',
-    version='0.4.2',
+    version='0.5',
     author='Peter Murphy',
     author_email='peterkmurphy@gmail.com',
     packages=['musictheory'],
