@@ -1,10 +1,10 @@
 #!/usr/bin/env python
      
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='musictheory',
-    version='0.5',
+    version='0.6.0.1',
     author='Peter Murphy',
     author_email='peterkmurphy@gmail.com',
     packages=['musictheory'],

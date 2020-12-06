@@ -2,7 +2,7 @@
 #-*- coding: UTF-8 -*-
 # scales.py: Defines the classes for note sequences and scales.
 #
-# Copyright (c) 2008-2013 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2020 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,8 @@
 
 import unittest;
 
-from musutility import rotate, rotate_and_zero, multislice;
-from temperament import temperament, WestTemp, seq_dict, NSEQ_SCALE, \
+from .musutility import rotate, rotate_and_zero, multislice;
+from .temperament import temperament, WestTemp, seq_dict, NSEQ_SCALE, \
     NSEQ_CHORD, M_SHARP, M_FLAT, CHROM_NAT_NOTE_POS;
 
 class noteseq:
@@ -195,8 +195,8 @@ class noteseq_scale(noteseq):
             OurNewScale = noteseq_scale(nseq_modes[i], nseq_temp, new_nseq_pos,
                 new_nseq_nat_pos);
 
-    def __unicode__(self):
-        return unicode(nseq_name);
+    def __str__(self):
+        return str(nseq_name);
 
 # The following scales and names are derived from:
 # http://docs.solfege.org/3.9/C/scales/modes.html
@@ -207,7 +207,7 @@ class noteseq_scale(noteseq):
 # Note: MelMinScale represents a melodic minor scale _ascending_. See the
 # Aeolian mode of the Major scale for melodic minor scale _descending_.
 
-HEPT_NAT_POSNS = range(7);
+HEPT_NAT_POSNS = list(range(7));
 MEL_MIN_NOTE_POS = [0, 2, 3, 5, 7, 9, 11];
 HARM_MIN_NOTE_POS = [0, 2, 3, 5, 7, 8, 11];
 HARM_MAJ_NOTE_POS = [0, 2, 4, 5, 7, 8, 11];
@@ -296,151 +296,9 @@ def scale_analysis(scale_name, perm_chord_type):
         ournoteslice = noteseq_for_slice(i, perm_chord_type);
         notechord_founditem = noteseq.find_by_chord(ournoteslice);
         if notechord_founditem == None:
-            print "None";
+            print("None");
         else:
-            print notechord_founditem.getName();
+            print(notechord_founditem.getName());
             
     return;
-    
-if __name__ == "__main__":
-    class TestNoteSeqAndScales(unittest.TestCase):
-        """ This tests the note_seq and scales class. """
-        
-        def setUp(self):
-            self.majorscale = MajorScale;
-            self.melminscale = MelMinorScale;
-            self.harmminscale = HarmMinorScale;
-            self.harmmajscale = HarmMajorScale;
-            self.dorianscale = WestTemp.get_nseqby_seqpos(
-                [0, 2, 3, 5, 7, 9, 10], NSEQ_SCALE);
-            self.locrianscale = WestTemp.get_nseqby_seqpos(
-                [0, 1, 3, 5, 6, 8, 10], NSEQ_SCALE);
-            self.superlocrianscale = WestTemp.get_nseqby_seqpos(
-                [0, 1, 3, 4, 6, 8, 10], NSEQ_SCALE);
-            self.ultralocrianscale = WestTemp.get_nseqby_seqpos(
-                [0, 1, 3, 4, 6, 8, 9], NSEQ_SCALE);
-            self.dubflat7locrianscale = WestTemp.get_nseqby_seqpos(
-                [0, 1, 3, 5, 6, 8, 9], NSEQ_SCALE);
-            self.majorchord = noteseq("TestMajor", NSEQ_SCALE, WestTemp, 
-                [0, 4, 7], [0, 2, 4]);
-            
-        def test_temperament_dict(self):
-            """ Like test_seq_dict, but checks dictionary in WestTemp. """
-            self.assertTrue(WestTemp.check_nseqby_subdict(NSEQ_CHORD));
-            self.assertTrue(WestTemp.check_nseqby_subdict(NSEQ_SCALE));
-            self.assertFalse(WestTemp.check_nseqby_subdict(666));
-            self.assertTrue(WestTemp.check_nseqby_name(NSEQ_SCALE, "Major"));
-            self.assertFalse(WestTemp.check_nseqby_name(NSEQ_CHORD, "Minor"));
-            self.assertFalse(WestTemp.check_nseqby_name(NSEQ_SCALE, "Minor"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_SCALE, 
-                "maj"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_CHORD, 
-                "min"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_SCALE, 
-                "min"));
-            self.assertFalse(WestTemp.check_nseqby_seqpos(NSEQ_CHORD, 
-                CHROM_NAT_NOTE_POS));
-            self.assertTrue(WestTemp.check_nseqby_seqpos(NSEQ_SCALE, 
-                CHROM_NAT_NOTE_POS));
-            self.assertEqual(WestTemp.get_nseqby_name("Major", NSEQ_SCALE), 
-                self.majorscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Ionian", NSEQ_SCALE), 
-                self.majorscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Melodic Minor", 
-                NSEQ_SCALE), self.melminscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Jazz Minor", 
-                NSEQ_SCALE), self.melminscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Harmonic Minor", 
-                NSEQ_SCALE), self.harmminscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Harmonic Major", 
-                NSEQ_SCALE), self.harmmajscale); 
-            self.assertEqual(WestTemp.get_nseqby_name("Dorian", 
-                NSEQ_SCALE), self.dorianscale);
-            self.assertEqual(WestTemp.get_nseqby_name("Locrian", 
-                NSEQ_SCALE), self.locrianscale);  
-            self.assertEqual(WestTemp.get_nseqby_name("Superlocrian", 
-                NSEQ_SCALE), self.superlocrianscale);  
-            self.assertEqual(WestTemp.get_nseqby_name("Ultralocrian", 
-                NSEQ_SCALE), self.ultralocrianscale);                  
-            self.assertEqual(WestTemp.get_nseqby_name("Locrian " + M_FLAT \
-                + M_FLAT + "7", NSEQ_SCALE), self.dubflat7locrianscale);
-
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                CHROM_NAT_NOTE_POS, NSEQ_SCALE), self.majorscale);
-
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                MEL_MIN_NOTE_POS, NSEQ_SCALE), self.melminscale);
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                HARM_MIN_NOTE_POS, NSEQ_SCALE), self.harmminscale);
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                HARM_MAJ_NOTE_POS, NSEQ_SCALE), self.harmmajscale);                
-
-        def test_get_notes_for_key(self):
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0]), [u'E\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                1, [0]), ['G']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0]), [u'B\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0]), [u'E\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0, 2]), [u'E\u266d', u'B\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                1, [0, 2]), ['G', u'E\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0, 2]), [u'B\u266d', 'G']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0, 2]), [u'E\u266d', u'B\u266d']);
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0, 1]), [u'E\u266d', 'G']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                1, [0, 1]), ['G', u'B\u266d']);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0, 1]), [u'B\u266d', u'E\u266d',]);            
-            self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0, 1]), [u'E\u266d', 'G']);                
-            self.assertEqual(self.majorscale.get_notes_for_key("C", 
-                3, [0, 1, 2, 3]), ['F', 'G', 'A', 'B']);  
-
-        def test_get_posn_for_offset(self):
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, 
-                raz=False), [0, 4, 7]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, 
-                raz=True), [0, 4, 7]);            
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [0], 
-                raz=False), [0]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [0], 
-                raz=True), [0]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [1], 
-                raz=False), [4]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [1], 
-                raz=True), [0]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [2], 
-                raz=False), [7]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(0, [2], 
-                raz=True), [0]);                
-            self.assertEqual(self.majorchord.get_posn_for_offset(1, 
-                raz=False), [4, 7, 0]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(1, 
-                raz=True), [0, 3, 8]);            
-            self.assertEqual(self.majorchord.get_posn_for_offset(1, [0], 
-                raz=False), [4]);
-            self.assertEqual(self.majorchord.get_posn_for_offset(1, [0], 
-                raz=True), [0]);
-            self.assertEqual(self.majorscale.get_posn_for_offset(0, 
-                [0, 2, 4], raz=True), [0, 4, 7]);
-            self.assertEqual(self.majorscale.get_posn_for_offset(1, 
-                [0, 2, 4], raz=True), [0, 3, 7]);                 
-            self.assertEqual(self.majorscale.get_posn_for_offset(3, 
-                [0, 2, 4], raz=True), [0, 4, 7]);                
-            self.assertEqual(self.majorscale.get_posn_for_offset(4, 
-                [0, 2, 4], raz=True), [0, 4, 7]);
-            self.assertEqual(self.majorscale.get_posn_for_offset(6, 
-                [0, 2, 4], raz=True), [0, 3, 6]);                
-
-    unittest.main()
-
-    
-    
     

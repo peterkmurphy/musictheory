@@ -23,7 +23,14 @@ Installation
 
 You can get the application from PyPI through the command::
 
-    sudo pip install musictheory
+    pip install musictheory
+
+Testing
+-------
+
+Testing can be performed by executing the following code in the setup directory:
+
+    python -m test.test_all
 
 License
 -------
@@ -44,8 +51,10 @@ Versions
 
 * 0.5 (August 14th 2014) - Add some experimental suspended chords.
 
+* 0.6 (December 6th 2020) - Updated for Python 3.0 compatibility.
+
 Copyright
 ---------
 
-The **musictheory** is copyright (c) 2008-2014 `Peter Murphy <http://www.pkmurphy.com.au/>`_ 
+The **musictheory** is copyright (c) 2008-2020 `Peter Murphy <http://www.pkmurphy.com.au/>`_ 
 <peterkmurphy@gmail.com>.

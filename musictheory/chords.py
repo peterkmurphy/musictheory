@@ -2,7 +2,7 @@
 #-*- coding: UTF-8 -*-
 # chords.py: Defines (and contains) the classes for chords.
 #
-# Copyright (c) 2008-2014 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2020 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,10 +29,10 @@
 
 import unittest;
 
-from musutility import enl_seq;
-from temperament import temperament, WestTemp, seq_dict, NSEQ_SCALE, \
+from .musutility import enl_seq;
+from .temperament import temperament, WestTemp, seq_dict, NSEQ_SCALE, \
     NSEQ_CHORD, M_SHARP, M_FLAT;
-from scales import noteseq, noteseq_scale;    
+from .scales import noteseq, noteseq_scale;    
 
 class noteseq_chord(noteseq):
     """ A specialisation of noteseq used exclusively for defining chords -
@@ -50,9 +50,9 @@ class noteseq_chord(noteseq):
         noteseq.__init__(self, nseq_name, NSEQ_CHORD, nseq_temp, nseq_posn, 
             nseq_nat_posns, nseq_abbrev); 
 
-    def __unicode__(self):
-        return unicode(self.nseq_name)+":"+unicode(self.nseq_abbrev)+":" \
-            + unicode(self.nseq_posn);
+    def __str__(self):
+        return str(self.nseq_name)+":"+str(self.nseq_abbrev)+":" \
+            + str(self.nseq_posn);
 
 # This dictionary contains a list of different nseq_nat_posns values for 
 # different types of chords in the Western tradition. Note that all arrays are
@@ -283,9 +283,12 @@ def generate_west_chords():
     
 ourchords = generate_west_chords();  
 
-if __name__ == "__main__":
+# 2020 - the following testing code is commented out, as I don't know
+# why it was put together in the first place.
+
+""" if __name__ == "__main__":
     for i in ourchords:
-        print unicode(i);
+        print(str(i));
 
     class TestChords(unittest.TestCase):
         """ This tests the generation of common chords (i.e, major). """
@@ -312,29 +315,29 @@ if __name__ == "__main__":
 
         def test_get_notes_for_chord(self):
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0]), [u'E\u266d']);            
+                0, [0]), ['E\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
                 1, [0]), ['G']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0]), [u'B\u266d']);            
+                2, [0]), ['B\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0]), [u'E\u266d']);            
+                3, [0]), ['E\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0, 2]), [u'E\u266d', u'B\u266d']);            
+                0, [0, 2]), ['E\u266d', 'B\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                1, [0, 2]), ['G', u'E\u266d']);            
+                1, [0, 2]), ['G', 'E\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0, 2]), [u'B\u266d', 'G']);            
+                2, [0, 2]), ['B\u266d', 'G']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0, 2]), [u'E\u266d', u'B\u266d']);
+                3, [0, 2]), ['E\u266d', 'B\u266d']);
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                0, [0, 1]), [u'E\u266d', 'G']);            
+                0, [0, 1]), ['E\u266d', 'G']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                1, [0, 1]), ['G', u'B\u266d']);            
+                1, [0, 1]), ['G', 'B\u266d']);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                2, [0, 1]), [u'B\u266d', u'E\u266d',]);            
+                2, [0, 1]), ['B\u266d', 'E\u266d',]);            
             self.assertEqual(self.majorchord.get_notes_for_key("Eb", 
-                3, [0, 1]), [u'E\u266d', 'G']);                
+                3, [0, 1]), ['E\u266d', 'G']);                
 
 
         def test_get_posn_for_chord(self):
@@ -367,5 +370,5 @@ if __name__ == "__main__":
     unittest.main()
 
 
-
+ """
 

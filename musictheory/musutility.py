@@ -2,7 +2,7 @@
 #-*- coding: UTF-8 -*-
 # musutility.py: Defines utility functions not properly part of other modules.
 #
-# Copyright (c) 2008-2013 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2020 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ import unittest;
 
 def printunicode(value, encoding = "utf-8"):
     """ Prints an unescaped unicode string to the system console. """
-    uval = unicode(value);
+    uval = str(value);
     sys.stdout.write(codecs.encode(uval + '\n', encoding));
 
 # Make sequences representable as strings.
@@ -48,7 +48,7 @@ def seqtostr(value):
     if not value:
         return output;
     for i in value:
-        output += unicode(i) + ", ";
+        output += str(i) + ", ";
         
 # Trim the last two characters.
 
@@ -134,9 +134,9 @@ def repseq(seq, pre_process = lambda x: x):
     """
     SPACECOMMA = ", ";
     if len(seq) == 0:
-        return u"";
-    str_out = ''.join([(unicode(pre_process(item)) + SPACECOMMA) 
-        for item in seq[:-1]]) + unicode(pre_process(seq[-1]));
+        return "";
+    str_out = ''.join([(str(pre_process(item)) + SPACECOMMA) 
+        for item in seq[:-1]]) + str(pre_process(seq[-1]));
     return str_out;
 
 def enl_seq(seq_of_seq, otherentries):
@@ -158,7 +158,7 @@ def norm_seq(seq, mod):
         
         Note: this function is useful for looking up chords by their patterns.
     """
-    sorted_seq = sorted(map(lambda x: x % mod, seq));
+    sorted_seq = sorted([x % mod for x in seq]);
 
 # We remove duplicates. The following code is straight outta the Python FAQ.
     
@@ -169,169 +169,4 @@ def norm_seq(seq, mod):
         else:
             last = sorted_seq[i]
     return sorted_seq;
-
-
-if __name__ == "__main__":
-    
-    class TestMusutility(unittest.TestCase):
-        """ This only tests functions in this module. """
-        
-        def setUp(self):
-            self.eseq = [];
-            self.one_elem_seq = ["0"];
-            self.one_elem_seq_one = ["1"]
-            self.two_elem_seq = ["0", "1"];
-            self.two_elem_seq_rot = ["1", "0"];
-            self.three_elem_seq = ["0", "1", "2", "3"];
-            self.three_elem_seq_left = ["1", "2", "3", "0"];
-            self.three_elem_seq_right = ["3", "0", "1", "2"]; 
-            self.all_test_seq = [[], ["0"], ["0", "1"], ["1", "0"],
-                ["0", "1", "2", "3"], ["1", "2", "3", "0"], 
-                ["3", "0", "1", "2"]];
-
-        def test_rotate(self):
-            self.assertEqual(rotate(self.eseq, 0), self.eseq);
-            self.assertEqual(rotate(self.eseq, 1), self.eseq);
-            self.assertEqual(rotate(self.eseq, -1), self.eseq);
-            self.assertEqual(rotate(self.one_elem_seq, 0), 
-                self.one_elem_seq);
-            self.assertEqual(rotate(self.one_elem_seq, 1), 
-                self.one_elem_seq);
-            self.assertEqual(rotate(self.one_elem_seq, -1), 
-                self.one_elem_seq);
-            self.assertEqual(rotate(self.two_elem_seq, 0), 
-                self.two_elem_seq);
-            self.assertEqual(rotate(self.two_elem_seq, 1), 
-                self.two_elem_seq_rot);
-            self.assertEqual(rotate(self.two_elem_seq, -1), 
-                self.two_elem_seq_rot);
-            self.assertEqual(rotate(self.three_elem_seq, 0), 
-                self.three_elem_seq);
-            self.assertEqual(rotate(self.three_elem_seq, 1), 
-                self.three_elem_seq_left);
-            self.assertEqual(rotate(self.three_elem_seq, -1), 
-                self.three_elem_seq_right);
- 
-        def test_scalar_addition(self):
-            
-# Tests on small sequences.            
-            
-            self.assertEqual(scalar_addition([], 0, 0), []);
-            self.assertEqual(scalar_addition([], 0, 5), []);
-            self.assertEqual(scalar_addition([], 5, 0), []);
-            self.assertEqual(scalar_addition([], 5, 5), []);
-            self.assertEqual(scalar_addition([1], 0, 0), [1]);
-            self.assertEqual(scalar_addition([1], 0, 5), [1]);
-            self.assertEqual(scalar_addition([1], 5, 0), [6]);
-            self.assertEqual(scalar_addition([1], 5, 5), [1]);            
-            self.assertEqual(scalar_addition([-1], 0, 0), [-1]);
-            self.assertEqual(scalar_addition([-1], 0, 5), [4]);
-            self.assertEqual(scalar_addition([-1], 5, 0), [4]);
-            self.assertEqual(scalar_addition([-1], 5, 5), [4]);  
-
-# Tests on sequences used in the representation of the major chord.
-
-            self.assertEqual(scalar_addition([4, 7, 0], -4, 12), [0, 3, 8]);
-            self.assertEqual(scalar_addition([3, 8, 0], -3, 12), [0, 5, 9]);
-            self.assertEqual(scalar_addition([5, 9, 0], -5, 12), [0, 4, 7]);
-            self.assertEqual(scalar_addition([2, 4, 0], -2, 7), [0, 2, 5]);
-            self.assertEqual(scalar_addition([2, 5, 0], -2, 7), [0, 3, 5]);
-            self.assertEqual(scalar_addition([3, 5, 0], -3, 7), [0, 2, 4]);
-
-        def test_rotate_and_zero(self):
-
-# Tests on small sequences.            
-            
-            self.assertEqual(rotate_and_zero([], 0, 0), []);
-            self.assertEqual(rotate_and_zero([], 0, 5), []);
-            self.assertEqual(rotate_and_zero([], 5, 0), []);
-            self.assertEqual(rotate_and_zero([], 5, 5), []);
-            self.assertEqual(rotate_and_zero([1], 0, 0), [0]);
-            self.assertEqual(rotate_and_zero([1], 0, 5), [0]);
-            self.assertEqual(rotate_and_zero([1], 5, 0), [0]);
-            self.assertEqual(rotate_and_zero([1], 5, 5), [0]);            
-            self.assertEqual(rotate_and_zero([-1], 0, 0), [0]);
-            self.assertEqual(rotate_and_zero([-1], 0, 5), [0]);
-            self.assertEqual(rotate_and_zero([-1], 5, 0), [0]);
-            self.assertEqual(rotate_and_zero([-1], 5, 5), [0]);  
-
-# Tests on sequences used in the representation of the major chord.
-
-            self.assertEqual(rotate_and_zero([0, 4, 7], 1, 12), [0, 3, 8]);
-            self.assertEqual(rotate_and_zero([0, 3, 8], 1, 12), [0, 5, 9]);
-            self.assertEqual(rotate_and_zero([0, 5, 9], 1, 12), [0, 4, 7]);
-            self.assertEqual(rotate_and_zero([0, 2, 4], 1, 7), [0, 2, 5]);
-            self.assertEqual(rotate_and_zero([0, 2, 5], 1, 7), [0, 3, 5]);
-            self.assertEqual(rotate_and_zero([0, 3, 5], 1, 7), [0, 2, 4]);
-
-# And one for the diminished chord.
-
-            self.assertEqual(rotate_and_zero([0, 3, 6, 9], 1, 12), 
-                [0, 3, 6, 9]);
-
-        def test_multislice(self):
-            zero_slice = [0];
-            one_slice = [1];
-            zero_and_one_slice = [0, 1];
-
-# For all sequences, the empty slice ([]) acting on it returns [], irrespective
-# of the modulo and the offset.
-
-            for i in range(8):
-                for j in range(4):
-                    for k in self.all_test_seq:
-                        self.assertEqual(multislice(k, self.eseq,
-                            i, j), self.eseq);
-
-# For all sequences of one element, the zero slice ([0]) returns the same 
-# sequence, irrespective of the modulo and the offset.
-
-            for i in range(4):
-                for j in range(4):
-                    self.assertEqual(multislice(self.one_elem_seq,
-                        zero_slice, i, j), self.one_elem_seq);
-
-# Now we try slices on two elements.
-
-            for j in range(4):
-                for i in [0, 2, 4, 6]:
-                    self.assertEqual(multislice(self.two_elem_seq, 
-                        zero_slice, j, i), self.one_elem_seq);
-                    self.assertEqual(multislice(self.two_elem_seq_rot, 
-                        zero_slice, j, i), self.one_elem_seq_one);                    
-                for i in [1, 3, 5, 7]:
-                    self.assertEqual(multislice(self.two_elem_seq, 
-                        zero_slice, j, i), self.one_elem_seq_one);
-                    self.assertEqual(multislice(self.two_elem_seq_rot, 
-                        zero_slice, j, i), self.one_elem_seq); 
-
-# Slices of three elements should be tested later, but I would rather look at
-# implementing other routines. I may come back to them, or not.
-
-        def test_repseq(self):
-            doubler = lambda x: x * 2;
-            self.assertEqual(repseq(self.eseq), "");
-            self.assertEqual(repseq(self.eseq, doubler), "");
-            self.assertEqual(repseq([1]), "1");
-            self.assertEqual(repseq([1], doubler), "2");
-            self.assertEqual(repseq([1, 2]), "1, 2");
-            self.assertEqual(repseq([1, 2], doubler), "2, 4");            
-
-        def test_enl_seq(self):
-            self.assertEqual(enl_seq(self.eseq, self.eseq), self.eseq);
-            self.assertEqual(enl_seq(self.eseq, self.one_elem_seq), self.eseq);
-            self.assertEqual(enl_seq(self.one_elem_seq, self.eseq), self.eseq);
-            self.assertEqual(enl_seq([["0"]], self.one_elem_seq_one),
-                [["0","1"]]);
-
-        def test_norm_seq(self):
-            self.assertEqual(norm_seq([7, 6, 5], 7), [0, 5, 6]);
-            self.assertEqual(norm_seq([5, 6, 7], 7), [0, 5, 6]);
-            self.assertEqual(norm_seq([7, 6, 5], 12), [5, 6, 7]);
-            self.assertEqual(norm_seq([5, 6, 7], 12), [5, 6, 7]);
-            
-    unittest.main()
-   
-    
-    
 

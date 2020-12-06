@@ -3,7 +3,7 @@
 # temperament.py: Representing musical temperaments (and storing sequences
 # associated with them).
 #
-# Copyright (c) 2008-2013 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2020 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -37,13 +37,13 @@
 
 import re;
 import unittest;
-from musutility import printunicode, rotate, multislice, repseq;
+from .musutility import rotate, multislice, repseq;
 
 # Unicode string constants for music notation.
 
-M_SHARP = u"\u266f";
-M_NATURAL = u"\u266e";
-M_FLAT = u"\u266d";
+M_SHARP = "\u266f";
+M_NATURAL = "\u266e";
+M_FLAT = "\u266d";
 
 # Since this may not display on browsers, there are non-Unicode equivalents.
 
@@ -53,7 +53,7 @@ MNU_NATURAL = "n";
 
 # This constant is used for parsing note names into keys.
 
-RE_NOTEPARSE = u"(?P<basenotename>[A-Z](#|b|n|" + M_FLAT + "|" + M_NATURAL \
+RE_NOTEPARSE = "(?P<basenotename>[A-Z](#|b|n|" + M_FLAT + "|" + M_NATURAL \
     + "|"+ M_SHARP + ")*)";
 
 # Constants used for the nseq_type arguments in noteseqs. See scales.py for
@@ -134,7 +134,7 @@ class seq_dict():
             If nseq_type is not associated with any of the sub-dictionaries in
             seq_dict, then this function exits.
         """
-        if not self.nseqtype_maps.has_key(nseq_type):
+        if nseq_type not in self.nseqtype_maps:
             return False;
         sub_dictionary = self.nseqtype_maps[nseq_type];
         
@@ -148,12 +148,12 @@ class seq_dict():
         sub_dictionary.seqpos_dict[ourtuple] = elem;
 
 
-        if isinstance(name_s, basestring):
+        if isinstance(name_s, str):
             sub_dictionary.name_dict[name_s] = elem;
         else:
             for s in name_s:
                 sub_dictionary.name_dict[s] = elem;
-        if isinstance(abbrv_s, basestring):
+        if isinstance(abbrv_s, str):
             sub_dictionary.abbrv_dict[abbrv_s] = elem;
         else:
             for s in abbrv_s:
@@ -165,20 +165,20 @@ class seq_dict():
 
     def check_nseqby_subdict(self, nseq_type):
         """ Checks if there is a subdictionary associated with nseq_type. """
-        return self.nseqtype_maps.has_key(nseq_type);
+        return nseq_type in self.nseqtype_maps;
 
     def check_nseqby_name(self, nseq_type, name):
         """ Checks if there is a noteseq with a given name. """
-        return self.nseqtype_maps[nseq_type].name_dict.has_key(name);
+        return name in self.nseqtype_maps[nseq_type].name_dict;
         
     def check_nseqby_abbrv(self, nseq_type, abbrv):
         """ Checks if there is a noteseq with a given abbreviation. """
-        return self.nseqtype_maps[nseq_type].abbrv_dict.has_key(abbrv);
+        return abbrv in self.nseqtype_maps[nseq_type].abbrv_dict;
 
     def check_nseqby_seqpos(self, nseq_type, seqpos):
         """ Checks if there is a noteseq with a given sequence position. """
         sortedseqpos = tuple(sorted(seqpos));
-        return self.nseqtype_maps[nseq_type].seqpos_dict.has_key(sortedseqpos);    
+        return sortedseqpos in self.nseqtype_maps[nseq_type].seqpos_dict;    
 
     def get_nseqby_name(self, name, nseq_type):
         """ Looks up a noteseq by name. """
@@ -303,20 +303,18 @@ class temperament():
                 return desired_nat_note;
         else:
             accdtls = 0;
-            if self.pos_lookup_nat_key.has_key(pos % self.no_keys):
+            if (pos % self.no_keys) in self.pos_lookup_nat_key:
                 return self.pos_lookup_nat_key[pos % self.no_keys];
             elif sharp_not_flat:
                 while accdtls < self.no_keys:
                     accdtls = accdtls - 1;
-                    if self.pos_lookup_nat_key.has_key((pos + accdtls) 
-                        % self.no_keys):
+                    if ((pos + accdtls) % self.no_keys) in self.pos_lookup_nat_key:
                         return self.pos_lookup_nat_key[(pos + accdtls) 
                             % self.no_keys] + (M_SHARP * (-1 * accdtls));
             else:
                 while accdtls < self.no_keys:
                     accdtls = accdtls + 1;
-                    if self.pos_lookup_nat_key.has_key((pos + accdtls) 
-                        % self.no_keys):
+                    if ((pos + accdtls) % self.no_keys) in self.pos_lookup_nat_key:
                         return self.pos_lookup_nat_key[(pos + accdtls) 
                             % self.no_keys] + (M_FLAT * accdtls);
         return None;
@@ -434,195 +432,4 @@ CHROM_NAT_NOTES = ["C", "D", "E", "F", "G", "A", "B"];
 CHROM_NAT_NOTE_POS = [0, 2, 4, 5, 7, 9, 11];
 CHROM_SIZE = 12;
 WestTemp = temperament(CHROM_SIZE, CHROM_NAT_NOTES, CHROM_NAT_NOTE_POS);
-
-if __name__ == "__main__":
-
-    class TestTemperament(unittest.TestCase):
-        """ This tests the temperament class. it also tests the seq_dict
-            class and un_unicode_accdtls function, as they are associated. 
-        """
-        
-        def setUp(self):
-            self.chromabsrep = ["C", "C" + M_SHARP, "D", "E" + M_FLAT, "E", 
-                "F", "F" + M_SHARP, "G", "A" + M_FLAT, "A", "B" + M_FLAT, 
-                "B"+M_NATURAL];
-            self.chrom_as_sharp = ["C", "C" + M_SHARP, "D", "D" + M_SHARP, "E", 
-                "F", "F" + M_SHARP, "G", "G" + M_SHARP, "A", "A" + M_SHARP, 
-                "B"]; 
-            self.chrom_as_flat = ["C", "D" + M_FLAT, "D", "E" + M_FLAT, "E", 
-                "F", "G" + M_FLAT, "G", "A" + M_FLAT, "A", "B" + M_FLAT, 
-                "B"];
-            self.triad_pattern = [0, 2, 4];
-            self.major_interval = [0, 4, 7]; 
-            
-            self.ourseqdict = seq_dict([NSEQ_SCALE, NSEQ_CHORD], WestTemp);
-            self.majorchord = ["Major", "maj", self.major_interval];
-            self.majorscale = ["Major", [], CHROM_NAT_NOTE_POS];
-            self.seq_maps = seq_dict([NSEQ_SCALE, NSEQ_CHORD], WestTemp);
-            self.seq_maps.add_elem(self.majorchord, NSEQ_CHORD, "Major", "maj", 
-                self.major_interval);
-            self.seq_maps.add_elem(self.majorscale, NSEQ_SCALE, "Major", [], 
-                CHROM_NAT_NOTE_POS);                
-                
-        def test_temperament_init_(self):
-            self.assertEqual(WestTemp.no_keys, CHROM_SIZE);
-            self.assertEqual(WestTemp.no_nat_keys, 7);
-            self.assertEqual(WestTemp.nat_keys, CHROM_NAT_NOTES);
-            self.assertEqual(WestTemp.nat_key_posn, CHROM_NAT_NOTE_POS);
-            for i in range(7):
-                note_desired = CHROM_NAT_NOTES[i];
-                note_index = WestTemp.nat_key_pos_lookup[note_desired];
-                self.assertEqual(WestTemp.pos_lookup_nat_key[note_index],
-                    note_desired);
-            
-        def test_temperament_get_pos_of_key(self):
-            for i in range(CHROM_SIZE):
-                self.assertEqual(WestTemp.get_pos_of_key(self.chromabsrep[i]),
-                    i);
-
-        def test_temperament_get_key_of_pos(self):
-            for i in range(CHROM_SIZE):
-                self.assertEqual(WestTemp.get_key_of_pos(i, None, True),
-                    self.chrom_as_sharp[i]);            
-                self.assertEqual(WestTemp.get_key_of_pos(i, None, False),
-                    self.chrom_as_flat[i]);
-                if i < 6:
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "C", False),
-                        "C" + (M_SHARP * i));
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "B", False),
-                        "B" + (M_SHARP * (i + 1)));
-                elif i == 6:
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "C", False),
-                        "C" + (M_SHARP * 6));
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "B", False),
-                        "B" + (M_FLAT * 5));
-                else:
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "C", False),
-                        "C" + (M_FLAT * (12 - i)));
-                    self.assertEqual(WestTemp.get_key_of_pos(i, "B", False),
-                        "B" + (M_FLAT * (11 - i)));
-
-        def test_get_note_sequence(self):
-            self.assertEqual(WestTemp.get_note_sequence("C", 
-                self.major_interval, None, False), ["C", "E", "G"]);
-            self.assertEqual(WestTemp.get_note_sequence("C", 
-                self.major_interval, None, True), 
-                ["C", "E", "G"]);                
-            self.assertEqual(WestTemp.get_note_sequence("C", 
-                self.major_interval, self.triad_pattern, True), 
-                ["C", "E", "G"]);              
-            self.assertEqual(WestTemp.get_note_sequence("C#", 
-                self.major_interval, None, False), 
-                ["D" + M_FLAT, "F", "A" + M_FLAT]);
-            self.assertEqual(WestTemp.get_note_sequence("C#", 
-                self.major_interval, None, True), 
-                ["C" + M_SHARP, "F", "G" + M_SHARP]);                
-            self.assertEqual(WestTemp.get_note_sequence("C#", 
-                self.major_interval, self.triad_pattern, True), 
-                ["C" + M_SHARP, "E" + M_SHARP, "G" + M_SHARP]); 
-
-            self.assertEqual(WestTemp.get_note_sequence("Db", 
-                self.major_interval, None, False), 
-                ["D" + M_FLAT, "F", "A" + M_FLAT]);
-            self.assertEqual(WestTemp.get_note_sequence("Db", 
-                self.major_interval, None, True), 
-                ["C" + M_SHARP, "F", "G" + M_SHARP]);                
-            self.assertEqual(WestTemp.get_note_sequence("Db", 
-                self.major_interval, self.triad_pattern, True), 
-                ["D" + M_FLAT, "F", "A" + M_FLAT]); 
-         
-        def test_get_keyseq_notes(self):            
-            self.assertEqual(WestTemp.get_keyseq_notes(["C", "E", "G"]), 
-                ["C", [0, 4, 7]]);
-            self.assertEqual(WestTemp.get_keyseq_notes(["C" + M_SHARP,
-                "F", "A" + M_FLAT]), ["C" + M_SHARP, [0, 4, 7]]);                  
-            self.assertEqual(WestTemp.get_keyseq_notes(["D" + M_FLAT,
-                "F", "A" + M_FLAT]), ["D" + M_FLAT, [0, 4, 7]]);  
-
-        def test_un_unicode_accdtls(self):
-            """ We also do testing for the un_unicode_accdtls function. """
-            self.assertEqual(repseq(self.chromabsrep, un_unicode_accdtls), 
-                u"C, C#, D, Eb, E, F, F#, G, Ab, A, Bb, B");
-
-        def test_seq_dict(self):
-            """ Fits all testing for the seq_dict class in here. """
-            self.assertTrue(self.seq_maps.check_nseqby_subdict(NSEQ_CHORD));
-            self.assertTrue(self.seq_maps.check_nseqby_subdict(NSEQ_SCALE));
-            self.assertFalse(self.seq_maps.check_nseqby_subdict(666));
-            self.assertTrue(self.seq_maps.check_nseqby_name(NSEQ_CHORD, "Major"));
-            self.assertTrue(self.seq_maps.check_nseqby_name(NSEQ_SCALE, "Major"));
-            self.assertFalse(self.seq_maps.check_nseqby_name(NSEQ_CHORD, "Minor"));
-            self.assertFalse(self.seq_maps.check_nseqby_name(NSEQ_SCALE, "Minor"));
-            self.assertTrue(self.seq_maps.check_nseqby_abbrv(NSEQ_CHORD, 
-                "maj"));
-            self.assertFalse(self.seq_maps.check_nseqby_abbrv(NSEQ_SCALE, 
-                "maj"));
-            self.assertFalse(self.seq_maps.check_nseqby_abbrv(NSEQ_CHORD, 
-                "min"));
-            self.assertFalse(self.seq_maps.check_nseqby_abbrv(NSEQ_SCALE, 
-                "min"));
-            self.assertFalse(self.seq_maps.check_nseqby_seqpos(NSEQ_CHORD, 
-                CHROM_NAT_NOTE_POS));
-            self.assertTrue(self.seq_maps.check_nseqby_seqpos(NSEQ_SCALE, 
-                CHROM_NAT_NOTE_POS));
-            self.assertTrue(self.seq_maps.check_nseqby_seqpos(NSEQ_CHORD,
-                self.major_interval));
-            self.assertFalse(self.seq_maps.check_nseqby_seqpos(NSEQ_SCALE,
-                self.major_interval));
-            self.assertEqual(self.seq_maps.get_nseqby_name("Major", NSEQ_CHORD), 
-                self.majorchord);
-            self.assertEqual(self.seq_maps.get_nseqby_name("Major", NSEQ_SCALE), 
-                self.majorscale);
-            self.assertEqual(self.seq_maps.get_nseqby_abbrv("maj", NSEQ_CHORD), 
-                self.majorchord);                
-            self.assertEqual(self.seq_maps.get_nseqby_seqpos(
-                self.major_interval, NSEQ_CHORD), self.majorchord);
-            self.assertEqual(self.seq_maps.get_nseqby_seqpos(
-                CHROM_NAT_NOTE_POS, NSEQ_SCALE), self.majorscale);
-
-        def test_temperament_dict(self):
-            """ Like test_seq_dict, but checks dictionary in WestTemp. """
-            self.assertTrue(WestTemp.check_nseqby_subdict(NSEQ_CHORD));
-            self.assertTrue(WestTemp.check_nseqby_subdict(NSEQ_SCALE));
-            self.assertFalse(WestTemp.check_nseqby_subdict(666));
-            WestTemp.add_elem(self.majorchord, NSEQ_CHORD, "Major", "maj", 
-                self.major_interval);
-            WestTemp.add_elem(self.majorscale, NSEQ_SCALE, "Major", [], 
-                CHROM_NAT_NOTE_POS);     
-            self.assertTrue(WestTemp.check_nseqby_name(NSEQ_CHORD, "Major"));
-            self.assertTrue(WestTemp.check_nseqby_name(NSEQ_SCALE, "Major"));
-            self.assertFalse(WestTemp.check_nseqby_name(NSEQ_CHORD, "Minor"));
-            self.assertFalse(WestTemp.check_nseqby_name(NSEQ_SCALE, "Minor"));
-            self.assertTrue(WestTemp.check_nseqby_abbrv(NSEQ_CHORD, 
-                "maj"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_SCALE, 
-                "maj"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_CHORD, 
-                "min"));
-            self.assertFalse(WestTemp.check_nseqby_abbrv(NSEQ_SCALE, 
-                "min"));
-            self.assertFalse(WestTemp.check_nseqby_seqpos(NSEQ_CHORD, 
-                CHROM_NAT_NOTE_POS));
-            self.assertTrue(WestTemp.check_nseqby_seqpos(NSEQ_SCALE, 
-                CHROM_NAT_NOTE_POS));
-            self.assertTrue(WestTemp.check_nseqby_seqpos(NSEQ_CHORD,
-                self.major_interval));
-            self.assertFalse(WestTemp.check_nseqby_seqpos(NSEQ_SCALE,
-                self.major_interval));
-            self.assertEqual(WestTemp.get_nseqby_name("Major", NSEQ_CHORD), 
-                self.majorchord);
-            self.assertEqual(WestTemp.get_nseqby_name("Major", NSEQ_SCALE), 
-                self.majorscale);
-            self.assertEqual(WestTemp.get_nseqby_abbrv("maj", NSEQ_CHORD), 
-                self.majorchord);                
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                self.major_interval, NSEQ_CHORD), self.majorchord);
-            self.assertEqual(WestTemp.get_nseqby_seqpos(
-                CHROM_NAT_NOTE_POS, NSEQ_SCALE), self.majorscale);
-
-    unittest.main()
-   
-
-    
-    
 

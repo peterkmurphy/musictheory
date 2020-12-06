@@ -2,7 +2,7 @@
 #-*- coding: UTF-8 -*-
 # __init__.py: Defines the module for musictheory.
 #
-# Copyright (c) 2008-2013 Peter Murphy <peterkmurphy@gmail.com>
+# Copyright (c) 2008-2020 Peter Murphy <peterkmurphy@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,7 +29,8 @@
 
 __all__ = ["musutility", "temperament", "scales", "chords"];
 __author__ = "Peter Murphy (peterkmurphy@gmail.com)"
-__version__ = "0.4"
-__copyright__ = "Copyright (c) 2008-2013 Peter Murphy"
+__version__ = "0.6"
+__copyright__ = "Copyright (c) 2008-2020 Peter Murphy"
 __license__ = "BSD (3 clause)"
+__package__ = "musictheory"
     
